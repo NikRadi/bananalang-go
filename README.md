@@ -2,6 +2,8 @@
 Banana is a high-level, dynamic language that is compiled into Banana byte code and interpreted by the Banana virtual machine (BVM).  
 The purpose of this language is for me to learn Go.
 
+![Banana image](img/banana-lang.webp)
+
 ### Declarations
 
 #### Variable declaration
