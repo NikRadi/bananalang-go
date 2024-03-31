@@ -19,12 +19,14 @@ const (
 	Error Type = iota
 	EndOfFile
 	LiteralNumber
+	Plus
 )
 
 var tokens = [...]string{
 	Error: 			"Error",
 	EndOfFile: 		"EndOfFile",
 	LiteralNumber: 	"LiteralNumber",
+	Plus:			"Plus",
 }
 
 func (token Token) String() string {
@@ -52,20 +54,33 @@ func NewLexer(code string) *Lexer {
 }
 
 func (lexer *Lexer) EatToken() {
+	if lexer.CodeIndex == len(lexer.Code) {
+		lexer.token = Token{Type: EndOfFile}
+		return
+	}
+
 	c := lexer.peekChar()
 	switch c {
+	case '+':
+		lexer.token = Token{Type: Plus}
+		lexer.eatChar()
 	default:
 		if isDigit(c) {
 			lexer.token = Token{Type: LiteralNumber, Value: string(c)}
-			lexer.CodeIndex += 1
+			lexer.eatChar()
 		} else {
 			lexer.token = Token{Type: Error}
+			lexer.eatChar()
 		}
 	}
 }
 
 func (lexer *Lexer) PeekToken() Token {
 	return lexer.token
+}
+
+func (lexer *Lexer) eatChar() {
+	lexer.CodeIndex += 1
 }
 
 func (lexer *Lexer) peekChar() uint8 {
@@ -78,35 +93,87 @@ func isDigit(c uint8) bool {
 
 
 // ast
-type Literal struct {
-	Type 	Type
-	Value 	string
-}
+type (
+	Expression interface {}
 
+	Literal struct {
+		Type 	Type
+		Value 	string
+	}
+
+	BinaryOperator struct {
+		Operator 		Type
+		LeftExpression	Expression
+		RightExpression Expression
+	}
+)
 
 // parser
+type (
+	parseInfixOperatorFunction func(Expression) Expression
+	parsePrefixOperatorFunction func() Expression
+)
+
 type Parser struct {
-	Lexer *Lexer
+	Lexer 						*Lexer
+	infixOperators				map[Type]parseInfixOperatorFunction
+	infixOperatorPrecedences 	map[Type]int
+	prefixOperators 			map[Type]parsePrefixOperatorFunction
 }
 
 func NewParser(lexer *Lexer) *Parser {
-	return &Parser{
-		Lexer: lexer,
+	parser := &Parser{
+		Lexer: 						lexer,
+		infixOperators: 			make(map[Type]parseInfixOperatorFunction),
+		infixOperatorPrecedences:	make(map[Type]int),
+		prefixOperators: 			make(map[Type]parsePrefixOperatorFunction),
+	}
+
+	parser.infixOperators[Plus] = parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[Plus] = 10
+
+	parser.prefixOperators[LiteralNumber] = parser.parseNumber
+
+	return parser
+}
+
+func (parser *Parser) Parse() Expression {
+	return parser.parseExpression(0)
+}
+
+func (parser *Parser) parseBinaryOperation(leftExpression Expression) Expression {
+	tok := parser.Lexer.PeekToken()
+	parser.Lexer.EatToken()
+	rightExpression := parser.parseExpression(0)
+
+	return BinaryOperator{
+		Operator: 			tok.Type,
+		LeftExpression: 	leftExpression,
+		RightExpression:	rightExpression,
 	}
 }
 
-func (parser *Parser) Parse() Literal {
+func (parser *Parser) parseExpression(precedence int) Expression {
 	tok := parser.Lexer.PeekToken()
-	switch tok.Type {
-	case LiteralNumber:
-		return Literal{
-			Type: 	LiteralNumber,
-			Value:	tok.Value,
-		}
-	default:
-		fmt.Print("error")
-		return Literal{}
+	parsePrefixOperator := parser.prefixOperators[tok.Type]
+	leftExpression := parsePrefixOperator()
+
+	tok = parser.Lexer.PeekToken()
+	parseInfixOperator := parser.infixOperators[tok.Type]
+	for precedence < parser.infixOperatorPrecedences[tok.Type] {
+		leftExpression = parseInfixOperator(leftExpression)
+
+		tok = parser.Lexer.PeekToken()
+		parseInfixOperator = parser.infixOperators[tok.Type]
 	}
+
+	return leftExpression
+}
+
+func (parser *Parser) parseNumber() Expression {
+	tok := parser.Lexer.PeekToken()
+	parser.Lexer.EatToken()
+	return Literal{Type: LiteralNumber, Value: tok.Value}
 }
 
 
@@ -118,14 +185,19 @@ const (
 
 	// Print the top value of the stack
 	Print
+
+	// Pop the top two values, add them, and push the result
+	Add
 )
 
 
 // compiler
-func Compile(literal Literal) []Instruction {
+func Compile(expression Expression) []Instruction {
+	fmt.Println(expression)
 	var instructions []Instruction
-	if literal.Type == LiteralNumber {
-		value, err := strconv.Atoi(literal.Value)
+	switch expr := expression.(type) {
+	case Literal:
+		value, err := strconv.Atoi(expr.Value)
 		if err != nil {
 			fmt.Println("Compile error: Invalid number")
 			return nil
@@ -133,6 +205,14 @@ func Compile(literal Literal) []Instruction {
 
 		instructions = append(instructions, Push)
 		instructions = append(instructions, Instruction(value))
+	case BinaryOperator:
+		instructions = append(instructions, Compile(expr.LeftExpression)...)
+		instructions = append(instructions, Compile(expr.RightExpression)...)
+		if expr.Operator == Plus {
+			instructions = append(instructions, Add)
+		}
+	default:
+		fmt.Println("Compile error: Unknown expression type")
 	}
 
 	instructions = append(instructions, Print)
@@ -155,16 +235,22 @@ func Interpret(instructions []Instruction) {
 		case Print:
 			top := stack[sp - 1]
 			fmt.Println(top)
+		case Add:
+			value1 := stack[sp - 2]
+			value2 := stack[sp - 1]
+			stack[sp - 2] = value1 + value2
+			sp -= 1
 		}
 	}
 }
 
 
 func main() {
-	const code = "2"
+	const code = "2+3+1"
 	lexer := NewLexer(code)
 	parser := NewParser(lexer)
 	tree := parser.Parse()
 	instructions := Compile(tree)
+	fmt.Println("tree", instructions)
 	Interpret(instructions)
 }
