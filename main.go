@@ -21,6 +21,7 @@ const (
 	LiteralNumber
 	Plus
 	Minus
+	Star
 )
 
 var types = [...]string{
@@ -29,6 +30,7 @@ var types = [...]string{
 	LiteralNumber: 	"LiteralNumber",
 	Plus:			"Plus",
 	Minus:			"Minus",
+	Star:			"Star",
 }
 
 func (tokenType Type) String() string {
@@ -68,6 +70,9 @@ func (lexer *Lexer) EatToken() {
 		lexer.eatChar()
 	case '-':
 		lexer.token = Token{Type: Minus}
+		lexer.eatChar()
+	case '*':
+		lexer.token = Token{Type: Star}
 		lexer.eatChar()
 	default:
 		if isDigit(c) {
@@ -134,10 +139,13 @@ func NewParser(lexer *Lexer) *Parser {
 		prefixOperators: 			make(map[Type]parsePrefixOperatorFunction),
 	}
 
-	parser.infixOperators[Plus] = parser.parseBinaryOperation
-	parser.infixOperators[Minus] = parser.parseBinaryOperation
-	parser.infixOperatorPrecedences[Plus] = 10
-	parser.infixOperatorPrecedences[Minus] = 10
+	parser.infixOperators[Plus] 	= parser.parseBinaryOperation
+	parser.infixOperators[Minus] 	= parser.parseBinaryOperation
+	parser.infixOperators[Star] 	= parser.parseBinaryOperation
+
+	parser.infixOperatorPrecedences[Plus] 	= 10
+	parser.infixOperatorPrecedences[Minus] 	= 10
+	parser.infixOperatorPrecedences[Star] 	= 20
 
 	parser.prefixOperators[LiteralNumber] = parser.parseNumber
 
@@ -198,8 +206,11 @@ const (
 	// Pop the top two values, add them, and push the result
 	Add
 
-	// Pop the top two values, subtract the 2nd from the 1st ,and push the result
+	// Pop the top two values, subtract the 2nd from the 1st, and push the result
 	Sub
+
+	// Pop the top two values, multiply them, and push the result
+	Mul
 )
 
 func printInstructions(instructions []Instruction) {
@@ -216,6 +227,8 @@ func printInstructions(instructions []Instruction) {
 			fmt.Println("Add")
 		case Sub:
 			fmt.Println("Sub")
+		case Mul:
+			fmt.Println("Mul")
 		}
 	}
 }
@@ -241,6 +254,10 @@ func Compile(expression Expression) []Instruction {
 			instructions = append(instructions, Add)
 		case Minus:
 			instructions = append(instructions, Sub)
+		case Star:
+			instructions = append(instructions, Mul)
+		default:
+			fmt.Println("Compile error: Unknown binary operator")
 		}
 	default:
 		fmt.Println("Compile error: Unknown expression type")
@@ -275,13 +292,18 @@ func Interpret(instructions []Instruction) {
 			value2 := stack[sp - 1]
 			stack[sp - 2] = value1 - value2
 			sp -= 1
+		case Mul:
+			value1 := stack[sp - 2]
+			value2 := stack[sp - 1]
+			stack[sp - 2] = value1 * value2
+			sp -= 1
 		}
 	}
 }
 
 
 func main() {
-	const code = "3-4+5"
+	const code = "1+2*3-1"
 	lexer := NewLexer(code)
 	parser := NewParser(lexer)
 	tree := parser.Parse()
