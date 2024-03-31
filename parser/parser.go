@@ -4,6 +4,8 @@ import (
 	"bananalang/ast"
 	"bananalang/lexer"
 	"bananalang/token"
+	"fmt"
+	"os"
 )
 
 type (
@@ -59,7 +61,12 @@ func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Ex
 
 func (parser *Parser) parseExpression(precedence int) ast.Expression {
 	tok := parser.Lexer.PeekToken()
-	parsePrefixOperator := parser.prefixOperators[tok.Type]
+	parsePrefixOperator, ok := parser.prefixOperators[tok.Type]
+	if !ok {
+		fmt.Println("Expected expression", tok)
+		os.Exit(1)
+	}
+
 	leftExpression := parsePrefixOperator()
 
 	tok = parser.Lexer.PeekToken()

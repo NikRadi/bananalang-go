@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bananalang/token"
+	"fmt"
 )
 
 type Lexer struct {
@@ -23,6 +24,15 @@ func NewLexer(code string) *Lexer {
 }
 
 func (lexer *Lexer) EatToken() {
+	for lexer.CodeIndex < len(lexer.Code) {
+		c := lexer.peekChar()
+		if c == '\n' || c == ' ' {
+			lexer.eatChar()
+		} else {
+			break
+		}
+	}
+
 	if lexer.CodeIndex == len(lexer.Code) {
 		lexer.token = token.Token{Type: token.EndOfFile}
 		return
@@ -46,6 +56,7 @@ func (lexer *Lexer) EatToken() {
 		} else {
 			lexer.token = token.Token{Type: token.Error}
 			lexer.eatChar()
+			fmt.Println("Error token")
 		}
 	}
 }

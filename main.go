@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	const code = "1+2*3-1"
+	const code = "1   +   2  *3-  1"
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
 	tree := par.Parse()
