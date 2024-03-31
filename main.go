@@ -190,10 +190,24 @@ const (
 	Add
 )
 
+func printInstructions(instructions []Instruction) {
+	for i := 0; i < len(instructions); i += 1 {
+		instruction := instructions[i]
+		switch instruction {
+		case Push:
+			i += 1
+			value := instructions[i]
+			fmt.Println("Push", value)
+		case Print:
+			fmt.Println("Print")
+		case Add:
+			fmt.Println("Add")
+		}
+	}
+}
 
 // compiler
 func Compile(expression Expression) []Instruction {
-	fmt.Println(expression)
 	var instructions []Instruction
 	switch expr := expression.(type) {
 	case Literal:
@@ -215,7 +229,6 @@ func Compile(expression Expression) []Instruction {
 		fmt.Println("Compile error: Unknown expression type")
 	}
 
-	instructions = append(instructions, Print)
 	return instructions
 }
 
@@ -246,11 +259,12 @@ func Interpret(instructions []Instruction) {
 
 
 func main() {
-	const code = "2+3+1"
+	const code = "5+6+7"
 	lexer := NewLexer(code)
 	parser := NewParser(lexer)
 	tree := parser.Parse()
 	instructions := Compile(tree)
-	fmt.Println("tree", instructions)
+	instructions = append(instructions, Print)
+	printInstructions(instructions)
 	Interpret(instructions)
 }
