@@ -28,40 +28,37 @@ func NewCompiler() *Compiler {
 }
 
 func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
-	var instructions []opcode.Opcode
 	switch expr := expression.(type) {
 	case ast.Literal:
 		switch expr.Type {
 		case token.LiteralNumber:
-			value, err := strconv.Atoi(expr.Value)
-			if err != nil {
-				fmt.Println("Compile error: Invalid number")
-				return nil
-			}
-
-			instructions = append(instructions, opcode.Push)
-			instructions = append(instructions, opcode.Opcode(value))
+			value, _ := strconv.Atoi(expr.Value)
+			compiler.emit(opcode.Push, opcode.Opcode(value))
 		default:
-			fmt.Println("Compile error: Invalid literal", expr.Type)
+			fmt.Println("Compile error: unknown literal")
 		}
 	case ast.BinaryOperator:
-		instructions = append(instructions, compiler.Compile(expr.LeftExpression)...)
-		instructions = append(instructions, compiler.Compile(expr.RightExpression)...)
+		compiler.Compile(expr.LeftExpression)
+		compiler.Compile(expr.RightExpression)
 		switch expr.Operator {
 		case token.Plus:
-			instructions = append(instructions, opcode.Add)
+			compiler.emit(opcode.Add)
 		case token.Minus:
-			instructions = append(instructions, opcode.Sub)
+			compiler.emit(opcode.Sub)
 		case token.Star:
-			instructions = append(instructions, opcode.Mul)
+			compiler.emit(opcode.Mul)
 		default:
-			fmt.Println("Compile error: Unknown binary operator")
+			fmt.Println("Compile error: unknown binary operator")
 		}
 	default:
-		fmt.Println("Compile error: Unknown expression type")
+		fmt.Printf("Compile error: unknown expression type: %T\n", expr)
 	}
 
-	return instructions
+	return compiler.instructions
+}
+
+func (compiler *Compiler) emit(codes ...opcode.Opcode) {
+	compiler.instructions = append(compiler.instructions, codes...)
 }
 
 func (compiler *Compiler) addSymbol(name string) {
