@@ -12,18 +12,24 @@ type (
 const (
 	Error Type = iota
 	EndOfFile
+	Identifier
 	LiteralNumber
-	Plus
-	Minus
-	Star
+
+	// Signs
+	Equals	// =
+	Plus	// +
+	Minus	// -
+	Star	// *
 )
 
 var types = [...]string{
-	Error: 			"Error",
 	EndOfFile: 		"EndOfFile",
+	Equals:			"Equals",
+	Error: 			"Error",
+	Identifier:		"Identifier",
 	LiteralNumber: 	"LiteralNumber",
-	Plus:			"Plus",
 	Minus:			"Minus",
+	Plus:			"Plus",
 	Star:			"Star",
 }
 

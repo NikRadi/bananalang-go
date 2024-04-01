@@ -1,14 +1,14 @@
-package instruction
+package opcode
 
 import (
 	"fmt"
 )
 
-type Instruction byte
+type Opcode byte
 
 const (
 	// Push a value to the stack
-	Push Instruction = iota
+	Push Opcode = iota
 
 	// Print the top value of the stack
 	Print
@@ -23,22 +23,27 @@ const (
 	Mul
 )
 
-func PrintInstructions(instructions []Instruction) {
+var opcodes = [...]string{
+	Push:	"Push",
+	Print:	"Print",
+	Add:	"Add",
+	Sub:	"Sub",
+	Mul:	"Mul",
+}
+
+func (opcode Opcode) String() string {
+	return opcodes[opcode]
+}
+
+func PrintOpcodes(instructions []Opcode) {
 	for i := 0; i < len(instructions); i += 1 {
-		instruction := instructions[i]
-		switch instruction {
+		instr := instructions[i]
+		switch instr {
 		case Push:
 			i += 1
-			value := instructions[i]
-			fmt.Println("Push", value)
-		case Print:
-			fmt.Println("Print")
-		case Add:
-			fmt.Println("Add")
-		case Sub:
-			fmt.Println("Sub")
-		case Mul:
-			fmt.Println("Mul")
+			fmt.Printf("%-10s %d\n", instr, instructions[i])
+		default:
+			fmt.Println(instr)
 		}
 	}
 }

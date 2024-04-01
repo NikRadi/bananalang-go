@@ -6,15 +6,15 @@ import (
 )
 
 type Lexer struct {
-	Code 		string
-	CodeIndex	int
+	code 		string
+	codeIndex	int
 	token		token.Token
 }
 
 func NewLexer(code string) *Lexer {
 	lexer := &Lexer{
-		Code: 		code,
-		CodeIndex: 	0,
+		code: 		code,
+		codeIndex: 	0,
 		token:		token.Token{},
 	}
 
@@ -24,7 +24,7 @@ func NewLexer(code string) *Lexer {
 }
 
 func (lexer *Lexer) EatToken() {
-	for lexer.CodeIndex < len(lexer.Code) {
+	for lexer.codeIndex < len(lexer.code) {
 		c := lexer.peekChar()
 		if c == '\n' || c == ' ' {
 			lexer.eatChar()
@@ -33,13 +33,16 @@ func (lexer *Lexer) EatToken() {
 		}
 	}
 
-	if lexer.CodeIndex == len(lexer.Code) {
+	if lexer.codeIndex == len(lexer.code) {
 		lexer.token = token.Token{Type: token.EndOfFile}
 		return
 	}
 
 	c := lexer.peekChar()
 	switch c {
+	case '=':
+		lexer.token = token.Token{Type: token.Equals}
+		lexer.eatChar()
 	case '+':
 		lexer.token = token.Token{Type: token.Plus}
 		lexer.eatChar()
@@ -52,6 +55,9 @@ func (lexer *Lexer) EatToken() {
 	default:
 		if isDigit(c) {
 			lexer.token = token.Token{Type: token.LiteralNumber, Value: string(c)}
+			lexer.eatChar()
+		} else if isAlphabetic(c) || c == '_' {
+			lexer.token = token.Token{Type: token.Identifier, Value: string(c)}
 			lexer.eatChar()
 		} else {
 			lexer.token = token.Token{Type: token.Error}
@@ -66,11 +72,15 @@ func (lexer *Lexer) PeekToken() token.Token {
 }
 
 func (lexer *Lexer) eatChar() {
-	lexer.CodeIndex += 1
+	lexer.codeIndex += 1
 }
 
 func (lexer *Lexer) peekChar() uint8 {
-	return lexer.Code[lexer.CodeIndex]
+	return lexer.code[lexer.codeIndex]
+}
+
+func isAlphabetic(c uint8) bool {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')
 }
 
 func isDigit(c uint8) bool {

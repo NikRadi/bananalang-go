@@ -4,17 +4,25 @@ import (
 	"bananalang/compiler"
 	"bananalang/lexer"
 	"bananalang/parser"
-	"bananalang/instruction"
-	"bananalang/interpreter"
+	"bananalang/opcode"
+	"bananalang/vm"
+	"fmt"
 )
 
 func main() {
-	const code = "1   +   2  *3-  1"
+	const code = "4-3*2"
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
+
 	tree := par.Parse()
-	instructions := compiler.Compile(tree)
-	instructions = append(instructions, instruction.Print)
-	instruction.PrintInstructions(instructions)
-	interpreter.Interpret(instructions)
+	fmt.Println(tree)
+
+	com := compiler.NewCompiler()
+	instructions := com.Compile(tree)
+
+	instructions = append(instructions, opcode.Print)
+	opcode.PrintOpcodes(instructions)
+
+	runtime := vm.NewVM()
+	runtime.Execute(instructions)
 }
