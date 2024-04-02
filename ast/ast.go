@@ -4,10 +4,17 @@ import (
 	"bananalang/token"
 )
 
-type Expression interface {
-	expression()
-}
+type (
+	Expression interface {
+		expression()
+	}
 
+	Statement interface {
+		statement()
+	}
+)
+
+// Expressions
 type (
 	Literal struct {
 		Type 	token.Type
@@ -29,3 +36,14 @@ type (
 func (Literal)			expression() {}
 func (BinaryOperator)	expression() {}
 func (UnaryOperator)	expression() {}
+
+// Statements
+type (
+	ExpressionStatement struct {
+		// TODO: Currently has an Expression slice for development purposes.
+		// 		 Should be changed to a single Expression.
+		Expressions []Expression
+	}
+)
+
+func (ExpressionStatement) 	statement() {}

@@ -41,6 +41,9 @@ func (lexer *Lexer) EatToken() {
 
 	c := lexer.peekChar()
 	switch c {
+	case ';':
+		lexer.eatChar()
+		lexer.token = token.Token{Type: token.Semicolon}
 	case '=':
 		lexer.eatChar()
 		if lexer.peekChar() == '=' {

@@ -19,7 +19,15 @@ func NewCompiler() *Compiler {
 	}
 }
 
-func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
+func (compiler *Compiler) Compile(statement ast.ExpressionStatement) []opcode.Opcode {
+	for _, expression := range statement.Expressions {
+		compiler.compileExpression(expression)
+	}
+
+	return compiler.instructions
+}
+
+func (compiler *Compiler) compileExpression(expression ast.Expression) {
 	switch expr := expression.(type) {
 	case ast.Literal:
 		switch expr.Type {
@@ -30,8 +38,8 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 			fmt.Println("Compile error: unknown literal")
 		}
 	case ast.BinaryOperator:
-		compiler.Compile(expr.LeftExpression)
-		compiler.Compile(expr.RightExpression)
+		compiler.compileExpression(expr.LeftExpression)
+		compiler.compileExpression(expr.RightExpression)
 		switch expr.Operator {
 		case token.Plus:
 			compiler.emit(opcode.Add)
@@ -56,7 +64,7 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 			os.Exit(1)
 		}
 	case ast.UnaryOperator:
-		compiler.Compile(expr.Expression)
+		compiler.compileExpression(expr.Expression)
 		switch expr.Operator {
 		case token.Minus:
 			compiler.emit(opcode.Neg)
@@ -68,8 +76,6 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 		fmt.Printf("Compile error: unknown expression type: %T\n", expr)
 		os.Exit(1)
 	}
-
-	return compiler.instructions
 }
 
 func (compiler *Compiler) emit(codes ...opcode.Opcode) {

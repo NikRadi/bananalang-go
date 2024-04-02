@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const code = "0>1"
+	const code = "1+2;3+4;"
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
 

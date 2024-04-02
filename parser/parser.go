@@ -73,8 +73,8 @@ func NewParser(lex *lexer.Lexer) *Parser {
 	return parser
 }
 
-func (parser *Parser) Parse() ast.Expression {
-	return parser.parseExpression(0)
+func (parser *Parser) Parse() ast.ExpressionStatement {
+	return parser.parseExpressionStatement()
 }
 
 func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Expression {
@@ -88,24 +88,6 @@ func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Ex
 		LeftExpression: 	leftExpression,
 		RightExpression:	rightExpression,
 	}
-}
-
-func (parser *Parser) parseUnaryPlusOperation() ast.Expression {
-	tok := parser.lexer.PeekToken()
-	parser.lexer.EatToken()
-
-	precedence := parser.prefixOperatorPrecedences[tok.Type]
-	expression := parser.parseExpression(precedence)
-	return expression
-}
-
-func (parser *Parser) parseUnaryOperation() ast.Expression {
-	tok := parser.lexer.PeekToken()
-	parser.lexer.EatToken()
-
-	precedence := parser.prefixOperatorPrecedences[tok.Type]
-	expression := parser.parseExpression(precedence)
-	return ast.UnaryOperator{Operator: tok.Type, Expression: expression}
 }
 
 func (parser *Parser) parseBracket() ast.Expression {
@@ -143,8 +125,37 @@ func (parser *Parser) parseNumber() ast.Expression {
 	return ast.Literal{Type: token.LiteralNumber, Value: tok.Value}
 }
 
+func (parser *Parser) parseUnaryOperation() ast.Expression {
+	tok := parser.lexer.PeekToken()
+	parser.lexer.EatToken()
+
+	precedence := parser.prefixOperatorPrecedences[tok.Type]
+	expression := parser.parseExpression(precedence)
+	return ast.UnaryOperator{Operator: tok.Type, Expression: expression}
+}
+
+func (parser *Parser) parseUnaryPlusOperation() ast.Expression {
+	tok := parser.lexer.PeekToken()
+	parser.lexer.EatToken()
+
+	precedence := parser.prefixOperatorPrecedences[tok.Type]
+	expression := parser.parseExpression(precedence)
+	return expression
+}
+
 func (parser *Parser) parseVariable() ast.Expression {
 	tok := parser.lexer.PeekToken()
 	parser.lexer.EatToken()
 	return ast.Literal{Type: token.Identifier, Value: tok.Value}
+}
+
+func (parser *Parser) parseExpressionStatement() ast.ExpressionStatement {
+	expressions := make([]ast.Expression, 0)
+	for parser.lexer.PeekToken().Type != token.EndOfFile {
+		expression := parser.parseExpression(0);
+		expressions = append(expressions, expression)
+		parser.lexer.EatToken() // ;
+	}
+
+	return ast.ExpressionStatement{Expressions: expressions}
 }

@@ -15,11 +15,13 @@ const (
 	Identifier
 	LiteralNumber
 
+	Semicolon			// ;
+	LeftRoundBracket 	// (
+	RightRoundBracket	// )
+
 	Plus				// +
 	Minus				// -
 	Star				// *
-	LeftRoundBracket 	// (
-	RightRoundBracket	// )
 
 	Equals				// =
 	TwoEquals			// ==
@@ -39,6 +41,7 @@ var types = [...]string{
 	Minus:			"Minus",
 	NotEquals:		"NotEquals",
 	Plus:			"Plus",
+	Semicolon:		"Semicolon",
 	Star:			"Star",
 	TwoEquals:		"TwoEquals",
 }
