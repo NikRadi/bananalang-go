@@ -3,6 +3,7 @@ package lexer
 import (
 	"bananalang/token"
 	"fmt"
+	"os"
 )
 
 type Lexer struct {
@@ -41,8 +42,38 @@ func (lexer *Lexer) EatToken() {
 	c := lexer.peekChar()
 	switch c {
 	case '=':
-		lexer.token = token.Token{Type: token.Equals}
 		lexer.eatChar()
+		if lexer.peekChar() == '=' {
+			lexer.eatChar()
+			lexer.token = token.Token{Type: token.TwoEquals}
+		} else {
+			lexer.token = token.Token{Type: token.Equals}
+		}
+	case '!':
+		lexer.eatChar()
+		if lexer.peekChar() == '=' {
+			lexer.eatChar()
+			lexer.token = token.Token{Type: token.NotEquals}
+		} else {
+			fmt.Println("Parsing error: unknown !")
+			os.Exit(1)
+		}
+	case '<':
+		lexer.eatChar()
+		if lexer.peekChar() == '=' {
+			lexer.eatChar()
+			lexer.token = token.Token{Type: token.LessThanEquals}
+		} else {
+			lexer.token = token.Token{Type: token.LessThan}
+		}
+	case '>':
+		lexer.eatChar()
+		if lexer.peekChar() == '=' {
+			lexer.eatChar()
+			lexer.token = token.Token{Type: token.GreaterThanEquals}
+		} else {
+			lexer.token = token.Token{Type: token.GreaterThan}
+		}
 	case '+':
 		lexer.token = token.Token{Type: token.Plus}
 		lexer.eatChar()

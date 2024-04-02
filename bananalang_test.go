@@ -22,7 +22,7 @@ func executeAndExpect(t *testing.T, code string, expected int) {
 	runtime.Execute(instructions)
 	actual := runtime.LastPoppedInt()
 	if actual != expected {
-		t.Errorf("Expected %d but got %d", expected, actual)
+		t.Errorf("Expected %d but got %d (%s)", expected, actual, code)
 	}
 }
 
@@ -43,4 +43,25 @@ func TestArithmetic(t *testing.T) {
 	executeAndExpect(t, "-4 + -4", -8)
 	executeAndExpect(t, "-----7", -7)
 	executeAndExpect(t, "1 + ++7", 8)
+
+	executeAndExpect(t, "1==1", 1)
+	executeAndExpect(t, "2==1", 0)
+	executeAndExpect(t, "1!=1", 0)
+	executeAndExpect(t, "2!=1", 1)
+
+	executeAndExpect(t, "1 > 1", 0)
+	executeAndExpect(t, "0 > 1", 0)
+	executeAndExpect(t, "2 > 1", 1)
+
+	executeAndExpect(t, "1 >= 1", 1)
+	executeAndExpect(t, "0 >= 1", 0)
+	executeAndExpect(t, "2 >= 1", 1)
+
+	executeAndExpect(t, "1 < 1", 0)
+	executeAndExpect(t, "0 < 1", 1)
+	executeAndExpect(t, "2 < 1", 0)
+
+	executeAndExpect(t, "1 <= 1", 1)
+	executeAndExpect(t, "0 <= 1", 1)
+	executeAndExpect(t, "2 <= 1", 0)
 }

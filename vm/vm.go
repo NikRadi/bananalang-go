@@ -48,6 +48,30 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 		case opcode.Neg:
 			value := vm.pop()
 			vm.push(-value)
+		case opcode.CmpEqu:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 == value1))
+		case opcode.CmpNeq:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 != value1))
+		case opcode.CmpLet:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 < value1))
+		case opcode.CmpLte:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 <= value1))
+		case opcode.CmpGrt:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 > value1))
+		case opcode.CmpGte:
+			value1 := vm.pop()
+			value2 := vm.pop()
+			vm.push(boolToInt(value2 >= value1))
 		default:
 			fmt.Println("Runtime error: Unknown instruction", code)
 			os.Exit(1)
@@ -72,4 +96,12 @@ func (vm *VM) push(value int) {
 
 func (vm *VM) LastPoppedInt() int {
 	return vm.stack[vm.sp]
+}
+
+func boolToInt(value bool) int {
+	if value {
+		return 1
+	}
+
+	return 0
 }

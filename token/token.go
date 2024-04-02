@@ -15,12 +15,19 @@ const (
 	Identifier
 	LiteralNumber
 
-	Equals				// =
 	Plus				// +
 	Minus				// -
 	Star				// *
 	LeftRoundBracket 	// (
 	RightRoundBracket	// )
+
+	Equals				// =
+	TwoEquals			// ==
+	NotEquals			// !=
+	LessThan			// <
+	LessThanEquals		// <=
+	GreaterThan			// >
+	GreaterThanEquals	// >=
 )
 
 var types = [...]string{
@@ -30,8 +37,10 @@ var types = [...]string{
 	Identifier:		"Identifier",
 	LiteralNumber: 	"LiteralNumber",
 	Minus:			"Minus",
+	NotEquals:		"NotEquals",
 	Plus:			"Plus",
 	Star:			"Star",
+	TwoEquals:		"TwoEquals",
 }
 
 func (tokenType Type) String() string {

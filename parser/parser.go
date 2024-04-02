@@ -30,24 +30,45 @@ func NewParser(lex *lexer.Lexer) *Parser {
 		prefixOperatorPrecedences:	make(map[token.Type]int),
 	}
 
-	parser.infixOperators[token.Equals] = parser.parseBinaryOperation
-	parser.infixOperators[token.Plus] 	= parser.parseBinaryOperation
-	parser.infixOperators[token.Minus] 	= parser.parseBinaryOperation
-	parser.infixOperators[token.Star] 	= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.Equals] 			=  9 // 10 - 1 because it is right associative
+	parser.infixOperators[token.Equals] 					= parser.parseBinaryOperation
 
-	parser.infixOperatorPrecedences[token.Equals] 	=  9 // 10 - 1 because it is right associative
-	parser.infixOperatorPrecedences[token.Plus] 	= 20
-	parser.infixOperatorPrecedences[token.Minus] 	= 20
-	parser.infixOperatorPrecedences[token.Star] 	= 30
+	parser.infixOperators[token.TwoEquals]					= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.TwoEquals]		= 20
 
-	parser.prefixOperators[token.LiteralNumber] 	= parser.parseNumber
-	parser.prefixOperators[token.Identifier] 		= parser.parseVariable
-	parser.prefixOperators[token.LeftRoundBracket]	= parser.parseBracket
-	parser.prefixOperators[token.Minus]				= parser.parseUnaryOperation
-	parser.prefixOperators[token.Plus]				= parser.parseUnaryPlusOperation
+	parser.infixOperators[token.NotEquals]					= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.NotEquals]		= 20
 
-	parser.prefixOperatorPrecedences[token.Minus]	= 60
-	parser.prefixOperatorPrecedences[token.Plus]	= 60
+	parser.infixOperators[token.LessThan] 					= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.LessThan] 		= 30
+
+	parser.infixOperators[token.LessThanEquals] 			= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.LessThanEquals]	= 30
+
+	parser.infixOperators[token.GreaterThan] 				= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.GreaterThan] 		= 30
+
+	parser.infixOperators[token.GreaterThanEquals] 			= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.GreaterThanEquals]= 30
+
+	parser.infixOperators[token.Plus] 						= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.Plus] 			= 40
+
+	parser.infixOperators[token.Minus] 						= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.Minus] 			= 40
+
+	parser.infixOperators[token.Star] 						= parser.parseBinaryOperation
+	parser.infixOperatorPrecedences[token.Star] 			= 50
+
+	parser.prefixOperators[token.Minus]						= parser.parseUnaryOperation
+	parser.prefixOperatorPrecedences[token.Minus]			= 60
+
+	parser.prefixOperators[token.Plus]						= parser.parseUnaryPlusOperation
+	parser.prefixOperatorPrecedences[token.Plus]			= 60
+
+	parser.prefixOperators[token.Identifier] 				= parser.parseVariable
+	parser.prefixOperators[token.LeftRoundBracket]			= parser.parseBracket
+	parser.prefixOperators[token.LiteralNumber] 			= parser.parseNumber
 
 	return parser
 }
@@ -62,7 +83,6 @@ func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Ex
 
 	precedence := parser.infixOperatorPrecedences[tok.Type]
 	rightExpression := parser.parseExpression(precedence)
-
 	return ast.BinaryOperator{
 		Operator: 			tok.Type,
 		LeftExpression: 	leftExpression,

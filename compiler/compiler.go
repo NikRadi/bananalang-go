@@ -39,8 +39,21 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 			compiler.emit(opcode.Sub)
 		case token.Star:
 			compiler.emit(opcode.Mul)
+		case token.TwoEquals:
+			compiler.emit(opcode.CmpEqu)
+		case token.NotEquals:
+			compiler.emit(opcode.CmpNeq)
+		case token.LessThan:
+			compiler.emit(opcode.CmpLet)
+		case token.LessThanEquals:
+			compiler.emit(opcode.CmpLte)
+		case token.GreaterThan:
+			compiler.emit(opcode.CmpGrt)
+		case token.GreaterThanEquals:
+			compiler.emit(opcode.CmpGte)
 		default:
 			fmt.Println("Compile error: unknown binary operator")
+			os.Exit(1)
 		}
 	case ast.UnaryOperator:
 		compiler.Compile(expr.Expression)
@@ -49,6 +62,7 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 			compiler.emit(opcode.Neg)
 		default:
 			fmt.Println("Compile error: unknown unary operator")
+			os.Exit(1)
 		}
 	default:
 		fmt.Printf("Compile error: unknown expression type: %T\n", expr)
