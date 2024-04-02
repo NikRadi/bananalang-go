@@ -34,49 +34,38 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 			value := vm.pop()
 			fmt.Println(value)
 		case opcode.Add:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(value2 + value1)
+			vm.binaryop(func(v1, v2 int) int { return v2 + v1 })
 		case opcode.Sub:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(value2 - value1)
+			vm.binaryop(func(v1, v2 int) int { return v2 - v1 })
 		case opcode.Mul:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(value2 * value1)
+			vm.binaryop(func(v1, v2 int) int { return v2 * v1 })
 		case opcode.Neg:
 			value := vm.pop()
 			vm.push(-value)
 		case opcode.CmpEqu:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 == value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 == v1) })
 		case opcode.CmpNeq:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 != value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 != v1) })
 		case opcode.CmpLet:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 < value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 < v1) })
 		case opcode.CmpLte:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 <= value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 <= v1) })
 		case opcode.CmpGrt:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 > value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 > v1) })
 		case opcode.CmpGte:
-			value1 := vm.pop()
-			value2 := vm.pop()
-			vm.push(boolToInt(value2 >= value1))
+			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 >= v1) })
 		default:
 			fmt.Println("Runtime error: Unknown instruction", code)
 			os.Exit(1)
 		}
 	}
+}
+
+func (vm *VM) binaryop(op func(int, int) int) {
+	value1 := vm.pop()
+	value2 := vm.pop()
+	result := op(value1, value2)
+	vm.push(result)
 }
 
 func (vm *VM) pop() int {
