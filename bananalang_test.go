@@ -16,7 +16,7 @@ func executeAndExpect(t *testing.T, code string, expected int) {
 
 	com := compiler.NewCompiler()
 	instructions := com.Compile(tree)
-	instructions = append(instructions, opcode.Print)
+	instructions = append(instructions, opcode.Pop)
 
 	runtime := vm.NewVM()
 	runtime.Execute(instructions)
@@ -37,4 +37,10 @@ func TestArithmetic(t *testing.T) {
 	executeAndExpect(t, "2 + (3 - 3)", 2)
 	executeAndExpect(t, "(2 * 3) - 2", 4)
 	executeAndExpect(t, "2 * (1 + 1)", 4)
+	executeAndExpect(t, "-1", -1)
+	executeAndExpect(t, "-(1 + 1)", -2)
+	executeAndExpect(t, "-3 * -2", 6)
+	executeAndExpect(t, "-4 + -4", -8)
+	executeAndExpect(t, "-----7", -7)
+	executeAndExpect(t, "1 + ++7", 8)
 }

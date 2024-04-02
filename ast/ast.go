@@ -19,7 +19,13 @@ type (
 		LeftExpression	Expression
 		RightExpression Expression
 	}
+
+	UnaryOperator struct {
+		Operator		token.Type
+		Expression 		Expression
+	}
 )
 
 func (Literal)			expression() {}
 func (BinaryOperator)	expression() {}
+func (UnaryOperator)	expression() {}

@@ -18,6 +18,7 @@ type Parser struct {
 	infixOperators				map[token.Type]parseInfixOperatorFunction
 	infixOperatorPrecedences 	map[token.Type]int
 	prefixOperators 			map[token.Type]parsePrefixOperatorFunction
+	prefixOperatorPrecedences 	map[token.Type]int
 }
 
 func NewParser(lex *lexer.Lexer) *Parser {
@@ -26,6 +27,7 @@ func NewParser(lex *lexer.Lexer) *Parser {
 		infixOperators: 			make(map[token.Type]parseInfixOperatorFunction),
 		infixOperatorPrecedences:	make(map[token.Type]int),
 		prefixOperators: 			make(map[token.Type]parsePrefixOperatorFunction),
+		prefixOperatorPrecedences:	make(map[token.Type]int),
 	}
 
 	parser.infixOperators[token.Equals] = parser.parseBinaryOperation
@@ -41,6 +43,11 @@ func NewParser(lex *lexer.Lexer) *Parser {
 	parser.prefixOperators[token.LiteralNumber] 	= parser.parseNumber
 	parser.prefixOperators[token.Identifier] 		= parser.parseVariable
 	parser.prefixOperators[token.LeftRoundBracket]	= parser.parseBracket
+	parser.prefixOperators[token.Minus]				= parser.parseUnaryOperation
+	parser.prefixOperators[token.Plus]				= parser.parseUnaryPlusOperation
+
+	parser.prefixOperatorPrecedences[token.Minus]	= 60
+	parser.prefixOperatorPrecedences[token.Plus]	= 60
 
 	return parser
 }
@@ -61,6 +68,24 @@ func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Ex
 		LeftExpression: 	leftExpression,
 		RightExpression:	rightExpression,
 	}
+}
+
+func (parser *Parser) parseUnaryPlusOperation() ast.Expression {
+	tok := parser.lexer.PeekToken()
+	parser.lexer.EatToken()
+
+	precedence := parser.prefixOperatorPrecedences[tok.Type]
+	expression := parser.parseExpression(precedence)
+	return expression
+}
+
+func (parser *Parser) parseUnaryOperation() ast.Expression {
+	tok := parser.lexer.PeekToken()
+	parser.lexer.EatToken()
+
+	precedence := parser.prefixOperatorPrecedences[tok.Type]
+	expression := parser.parseExpression(precedence)
+	return ast.UnaryOperator{Operator: tok.Type, Expression: expression}
 }
 
 func (parser *Parser) parseBracket() ast.Expression {

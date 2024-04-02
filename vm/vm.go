@@ -3,6 +3,7 @@ package vm
 import (
 	"bananalang/opcode"
 	"fmt"
+	"os"
 )
 
 const stackSize = 8
@@ -27,6 +28,8 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 			i += 1
 			value := int(codes[i])
 			vm.push(value)
+		case opcode.Pop:
+			vm.pop()
 		case opcode.Print:
 			value := vm.pop()
 			fmt.Println(value)
@@ -42,14 +45,23 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 			value1 := vm.pop()
 			value2 := vm.pop()
 			vm.push(value2 * value1)
+		case opcode.Neg:
+			value := vm.pop()
+			vm.push(-value)
 		default:
 			fmt.Println("Runtime error: Unknown instruction", code)
+			os.Exit(1)
 		}
 	}
 }
 
 func (vm *VM) pop() int {
 	vm.sp -= 1
+	if vm.sp < 0 {
+		fmt.Printf("Stack underflow: accessing sp at %d\n", vm.sp)
+		os.Exit(1)
+	}
+
 	return vm.stack[vm.sp]
 }
 

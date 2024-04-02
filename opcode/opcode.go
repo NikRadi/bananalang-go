@@ -10,6 +10,9 @@ const (
 	// Push a value to the stack
 	Push Opcode = iota
 
+	// Pop the top value of the stack
+	Pop
+
 	// Print the top value of the stack
 	Print
 
@@ -21,6 +24,9 @@ const (
 
 	// Pop the top two values, multiply them, and push the result
 	Mul
+
+	// Pop the top value, negate it, and push the result
+	Neg
 )
 
 var opcodes = [...]string{
@@ -29,6 +35,7 @@ var opcodes = [...]string{
 	Add:	"Add",
 	Sub:	"Sub",
 	Mul:	"Mul",
+	Neg:	"Neg",
 }
 
 func (opcode Opcode) String() string {

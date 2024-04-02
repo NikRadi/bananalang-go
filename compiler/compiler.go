@@ -5,6 +5,7 @@ import (
 	"bananalang/opcode"
 	"bananalang/token"
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -41,8 +42,17 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 		default:
 			fmt.Println("Compile error: unknown binary operator")
 		}
+	case ast.UnaryOperator:
+		compiler.Compile(expr.Expression)
+		switch expr.Operator {
+		case token.Minus:
+			compiler.emit(opcode.Neg)
+		default:
+			fmt.Println("Compile error: unknown unary operator")
+		}
 	default:
 		fmt.Printf("Compile error: unknown expression type: %T\n", expr)
+		os.Exit(1)
 	}
 
 	return compiler.instructions

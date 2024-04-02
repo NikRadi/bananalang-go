@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const code = "4-3*2"
+	const code = "-4 + -4"
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
 
