@@ -57,3 +57,7 @@ func (vm *VM) push(value int) {
 	vm.stack[vm.sp] = value
 	vm.sp += 1
 }
+
+func (vm *VM) LastPoppedInt() int {
+	return vm.stack[vm.sp]
+}
