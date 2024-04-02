@@ -75,14 +75,14 @@ func (lexer *Lexer) eatChar() {
 	lexer.codeIndex += 1
 }
 
-func (lexer *Lexer) peekChar() uint8 {
+func (lexer *Lexer) peekChar() byte {
 	return lexer.code[lexer.codeIndex]
 }
 
-func isAlphabetic(c uint8) bool {
+func isAlphabetic(c byte) bool {
 	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')
 }
 
-func isDigit(c uint8) bool {
+func isDigit(c byte) bool {
 	return '0' <= c && c <= '9'
 }

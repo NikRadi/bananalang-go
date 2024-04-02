@@ -4,9 +4,11 @@ import (
 	"bananalang/token"
 )
 
-type (
-	Expression interface {}
+type Expression interface {
+	expression()
+}
 
+type (
 	Literal struct {
 		Type 	token.Type
 		Value 	string
@@ -18,3 +20,6 @@ type (
 		RightExpression Expression
 	}
 )
+
+func (Literal)			expression() {}
+func (BinaryOperator)	expression() {}

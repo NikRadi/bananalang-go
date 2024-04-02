@@ -16,14 +16,12 @@ type (
 
 	Compiler struct {
 		instructions 	[]opcode.Opcode
-		symbols			map[string]int // Variable name to stack offset
 	}
 )
 
 func NewCompiler() *Compiler {
 	return &Compiler{
 		instructions:	[]opcode.Opcode{},
-		symbols:		make(map[string]int),
 	}
 }
 
@@ -59,20 +57,4 @@ func (compiler *Compiler) Compile(expression ast.Expression) []opcode.Opcode {
 
 func (compiler *Compiler) emit(codes ...opcode.Opcode) {
 	compiler.instructions = append(compiler.instructions, codes...)
-}
-
-func (compiler *Compiler) addSymbol(name string) {
-	if _, exists := compiler.symbols[name]; exists {
-		fmt.Println("Compile error: Symbol already exists", name)
-	}
-
-	compiler.symbols[name] = len(compiler.symbols)
-}
-
-func (compiler *Compiler) getSymbolOffset(name string) int {
-	if offset, exists := compiler.symbols[name]; exists {
-		return offset
-	}
-
-	return -1
 }
