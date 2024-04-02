@@ -15,11 +15,12 @@ const (
 	Identifier
 	LiteralNumber
 
-	// Signs
-	Equals	// =
-	Plus	// +
-	Minus	// -
-	Star	// *
+	Equals				// =
+	Plus				// +
+	Minus				// -
+	Star				// *
+	LeftRoundBracket 	// (
+	RightRoundBracket	// )
 )
 
 var types = [...]string{

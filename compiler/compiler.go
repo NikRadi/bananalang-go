@@ -8,16 +8,9 @@ import (
 	"strconv"
 )
 
-type (
-	symbol struct {
-		identifier 	string
-		offset		int
-	}
-
-	Compiler struct {
-		instructions 	[]opcode.Opcode
-	}
-)
+type Compiler struct {
+	instructions 	[]opcode.Opcode
+}
 
 func NewCompiler() *Compiler {
 	return &Compiler{

@@ -52,6 +52,12 @@ func (lexer *Lexer) EatToken() {
 	case '*':
 		lexer.token = token.Token{Type: token.Star}
 		lexer.eatChar()
+	case '(':
+		lexer.token = token.Token{Type: token.LeftRoundBracket}
+		lexer.eatChar()
+	case ')':
+		lexer.token = token.Token{Type: token.RightRoundBracket}
+		lexer.eatChar()
 	default:
 		if isDigit(c) {
 			lexer.token = token.Token{Type: token.LiteralNumber, Value: string(c)}

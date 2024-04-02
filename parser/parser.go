@@ -38,8 +38,9 @@ func NewParser(lex *lexer.Lexer) *Parser {
 	parser.infixOperatorPrecedences[token.Minus] 	= 20
 	parser.infixOperatorPrecedences[token.Star] 	= 30
 
-	parser.prefixOperators[token.LiteralNumber] = parser.parseNumber
-	parser.prefixOperators[token.Identifier] 	= parser.parseVariable
+	parser.prefixOperators[token.LiteralNumber] 	= parser.parseNumber
+	parser.prefixOperators[token.Identifier] 		= parser.parseVariable
+	parser.prefixOperators[token.LeftRoundBracket]	= parser.parseBracket
 
 	return parser
 }
@@ -60,6 +61,13 @@ func (parser *Parser) parseBinaryOperation(leftExpression ast.Expression) ast.Ex
 		LeftExpression: 	leftExpression,
 		RightExpression:	rightExpression,
 	}
+}
+
+func (parser *Parser) parseBracket() ast.Expression {
+	parser.lexer.EatToken() // (
+	expr := parser.parseExpression(0)
+	parser.lexer.EatToken() // )
+	return expr
 }
 
 func (parser *Parser) parseExpression(precedence int) ast.Expression {

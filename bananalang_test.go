@@ -34,4 +34,7 @@ func TestArithmetic(t *testing.T) {
 	executeAndExpect(t, "2 - 3 * 2", -4)
 	executeAndExpect(t, "2 * 3 + 2", 8)
 	executeAndExpect(t, "2 * 3 - 2", 4)
+	executeAndExpect(t, "2 + (3 - 3)", 2)
+	executeAndExpect(t, "(2 * 3) - 2", 4)
+	executeAndExpect(t, "2 * (1 + 1)", 4)
 }
