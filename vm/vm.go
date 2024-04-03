@@ -12,7 +12,7 @@ type VM struct {
 
 func NewVM() *VM {
 	frame := &Frame{
-		LocalVariables: make(LocalVariables, 0),
+		LocalVariables: make(LocalVariables, 1),
 		OperandStack:   make(OperandStack, 0),
 	}
 
@@ -24,15 +24,16 @@ func NewVM() *VM {
 func (vm *VM) Execute(codes []opcode.Opcode) {
 	for i := 0; i < len(codes); i += 1 {
 		code := codes[i]
+		frame := vm.Stack.current()
 		switch code {
 		case opcode.Push:
 			i += 1
 			value := int(codes[i])
-			vm.Stack.current().push(value)
+			frame.push(value)
 		case opcode.Pop:
-			vm.Stack.current().pop()
+			frame.pop()
 		case opcode.Print:
-			value := vm.Stack.current().pop()
+			value := frame.pop()
 			fmt.Println(value)
 		case opcode.Add:
 			vm.binaryop(func(v1, v2 int) int { return v2 + v1 })
@@ -41,8 +42,8 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 		case opcode.Mul:
 			vm.binaryop(func(v1, v2 int) int { return v2 * v1 })
 		case opcode.Neg:
-			value := vm.Stack.current().pop()
-			vm.Stack.current().push(-value)
+			value := frame.pop()
+			frame.push(-value)
 		case opcode.CmpEqu:
 			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 == v1) })
 		case opcode.CmpNeq:
@@ -55,6 +56,16 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 > v1) })
 		case opcode.CmpGte:
 			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 >= v1) })
+		case opcode.Store:
+			i += 1
+			index := int(codes[i])
+			value := frame.pop()
+			frame.store(index, value)
+		case opcode.Load:
+			i += 1
+			index := int(codes[i])
+			value := frame.load(index)
+			frame.push(value)
 		default:
 			fmt.Println("Runtime error: Unknown instruction", code)
 			os.Exit(1)

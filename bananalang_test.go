@@ -67,4 +67,7 @@ func TestArithmetic(t *testing.T) {
 	executeAndExpect(t, "2 <= 1;", 0)
 
 	executeAndExpect(t, "1+1; 2+2; 3+3", 6)
+
+	executeAndExpect(t, "a=2; a", 2)
+	executeAndExpect(t, "a=1+2; a=a*3; a;", 9)
 }

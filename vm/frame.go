@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	LocalVariables map[int]interface{}
+	LocalVariables []int
 
 	OperandStack []int
 
@@ -49,4 +49,12 @@ func (frame *Frame) pop() int {
 
 func (frame *Frame) push(value int) {
 	frame.OperandStack = append(frame.OperandStack, value)
+}
+
+func (frame *Frame) load(index int) int {
+	return frame.LocalVariables[index]
+}
+
+func (frame *Frame) store(index, value int) {
+	frame.LocalVariables[index] = value
 }

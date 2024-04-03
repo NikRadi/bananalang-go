@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const code = "1+2;3+4;"
+	const code = "a=2; a=a*3"
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
 
@@ -19,8 +19,6 @@ func main() {
 
 	com := compiler.NewCompiler()
 	instructions := com.Compile(tree)
-
-	instructions = append(instructions, opcode.Print)
 	opcode.PrintOpcodes(instructions)
 
 	runtime := vm.NewVM()

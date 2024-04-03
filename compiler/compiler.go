@@ -10,12 +10,12 @@ import (
 )
 
 type Compiler struct {
-	instructions 	[]opcode.Opcode
+	instructions []opcode.Opcode
 }
 
 func NewCompiler() *Compiler {
 	return &Compiler{
-		instructions:	[]opcode.Opcode{},
+		instructions: []opcode.Opcode{},
 	}
 }
 
@@ -34,11 +34,19 @@ func (compiler *Compiler) compileExpression(expression ast.Expression) {
 		case token.LiteralNumber:
 			value, _ := strconv.Atoi(expr.Value)
 			compiler.emit(opcode.Push, opcode.Opcode(value))
+		case token.Identifier:
+			compiler.emit(opcode.Load, opcode.Opcode(0))
 		default:
 			fmt.Println("Compile error: unknown literal", expr)
 			os.Exit(1)
 		}
 	case ast.BinaryOperator:
+		if expr.Operator == token.Equals {
+			compiler.compileExpression(expr.RightExpression)
+			compiler.emit(opcode.Store, opcode.Opcode(0))
+			break
+		}
+
 		compiler.compileExpression(expr.LeftExpression)
 		compiler.compileExpression(expr.RightExpression)
 		switch expr.Operator {

@@ -45,6 +45,12 @@ const (
 
 	// Pop the two top values, if 2ndl value >= 1st value push 1, otherwise push 0
 	CmpGte
+
+	// Load a local variable #index
+	Load
+
+	// Store a value into local variable #index
+	Store
 )
 
 var opcodes = [...]string{
@@ -60,6 +66,8 @@ var opcodes = [...]string{
 	CmpLte: "CmpLte",
 	CmpGrt: "CmpGrt",
 	CmpGte: "CmpGte",
+	Load:   "Load",
+	Store:  "Store",
 }
 
 func (opcode Opcode) String() string {
@@ -70,7 +78,7 @@ func PrintOpcodes(instructions []Opcode) {
 	for i := 0; i < len(instructions); i += 1 {
 		instr := instructions[i]
 		switch instr {
-		case Push:
+		case Push, Store, Load:
 			i += 1
 			fmt.Printf("%-10s %d\n", instr, instructions[i])
 		default:
