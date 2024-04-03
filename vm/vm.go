@@ -6,18 +6,19 @@ import (
 	"os"
 )
 
-const stackSize = 8
-
 type VM struct {
-	stack [stackSize]int
-	sp    int
+	Stack CallStack
 }
 
 func NewVM() *VM {
-	return &VM{
-		stack: [stackSize]int{},
-		sp:    0,
+	frame := &Frame{
+		LocalVariables: make(LocalVariables, 0),
+		OperandStack:   make(OperandStack, 0),
 	}
+
+	stack := make(CallStack, 0)
+	stack.push(frame)
+	return &VM{Stack: stack}
 }
 
 func (vm *VM) Execute(codes []opcode.Opcode) {
@@ -27,11 +28,11 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 		case opcode.Push:
 			i += 1
 			value := int(codes[i])
-			vm.push(value)
+			vm.Stack.current().push(value)
 		case opcode.Pop:
-			vm.pop()
+			vm.Stack.current().pop()
 		case opcode.Print:
-			value := vm.pop()
+			value := vm.Stack.current().pop()
 			fmt.Println(value)
 		case opcode.Add:
 			vm.binaryop(func(v1, v2 int) int { return v2 + v1 })
@@ -40,8 +41,8 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 		case opcode.Mul:
 			vm.binaryop(func(v1, v2 int) int { return v2 * v1 })
 		case opcode.Neg:
-			value := vm.pop()
-			vm.push(-value)
+			value := vm.Stack.current().pop()
+			vm.Stack.current().push(-value)
 		case opcode.CmpEqu:
 			vm.binaryop(func(v1, v2 int) int { return boolToInt(v2 == v1) })
 		case opcode.CmpNeq:
@@ -62,29 +63,10 @@ func (vm *VM) Execute(codes []opcode.Opcode) {
 }
 
 func (vm *VM) binaryop(op func(int, int) int) {
-	value1 := vm.pop()
-	value2 := vm.pop()
+	value1 := vm.Stack.current().pop()
+	value2 := vm.Stack.current().pop()
 	result := op(value1, value2)
-	vm.push(result)
-}
-
-func (vm *VM) pop() int {
-	vm.sp -= 1
-	if vm.sp < 0 {
-		fmt.Printf("Stack underflow: accessing sp at %d\n", vm.sp)
-		os.Exit(1)
-	}
-
-	return vm.stack[vm.sp]
-}
-
-func (vm *VM) push(value int) {
-	vm.stack[vm.sp] = value
-	vm.sp += 1
-}
-
-func (vm *VM) LastPoppedInt() int {
-	return vm.stack[vm.sp]
+	vm.Stack.current().push(result)
 }
 
 func boolToInt(value bool) int {

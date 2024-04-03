@@ -4,7 +4,6 @@ import (
 	"bananalang/compiler"
 	"bananalang/lexer"
 	"bananalang/parser"
-	"bananalang/opcode"
 	"bananalang/vm"
 	"testing"
 )
@@ -16,11 +15,13 @@ func executeAndExpect(t *testing.T, code string, expected int) {
 
 	com := compiler.NewCompiler()
 	instructions := com.Compile(tree)
-	instructions = append(instructions, opcode.Pop)
 
 	runtime := vm.NewVM()
 	runtime.Execute(instructions)
-	actual := runtime.LastPoppedInt()
+
+	frame := runtime.Stack[0]
+	index := len(frame.OperandStack) - 1
+	actual := frame.OperandStack[index]
 	if actual != expected {
 		t.Errorf("Expected %d but got %d (%s)", expected, actual, code)
 	}
