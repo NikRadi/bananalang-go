@@ -3,8 +3,8 @@ package main
 import (
 	"bananalang/compiler"
 	"bananalang/lexer"
-	"bananalang/parser"
 	"bananalang/opcode"
+	"bananalang/parser"
 	"bananalang/vm"
 	"fmt"
 )
@@ -25,4 +25,6 @@ func main() {
 
 	runtime := vm.NewVM()
 	runtime.Execute(instructions)
+	fmt.Println("=====")
+	fmt.Printf("Bytecodes: %d\n", len(instructions))
 }

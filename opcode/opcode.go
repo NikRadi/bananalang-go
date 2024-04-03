@@ -48,18 +48,18 @@ const (
 )
 
 var opcodes = [...]string{
-	Push:	"Push",
-	Print:	"Print",
-	Add:	"Add",
-	Sub:	"Sub",
-	Mul:	"Mul",
-	Neg:	"Neg",
-	CmpEqu:	"CmpEqu",
-	CmpNeq:	"CmpNeq",
-	CmpLet:	"CmpLet",
-	CmpLte:	"CmpLte",
-	CmpGrt:	"CmpGrt",
-	CmpGte:	"CmpGte",
+	Push:   "Push",
+	Print:  "Print",
+	Add:    "Add",
+	Sub:    "Sub",
+	Mul:    "Mul",
+	Neg:    "Neg",
+	CmpEqu: "CmpEqu",
+	CmpNeq: "CmpNeq",
+	CmpLet: "CmpLet",
+	CmpLte: "CmpLte",
+	CmpGrt: "CmpGrt",
+	CmpGte: "CmpGte",
 }
 
 func (opcode Opcode) String() string {

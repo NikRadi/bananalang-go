@@ -35,7 +35,8 @@ func (compiler *Compiler) compileExpression(expression ast.Expression) {
 			value, _ := strconv.Atoi(expr.Value)
 			compiler.emit(opcode.Push, opcode.Opcode(value))
 		default:
-			fmt.Println("Compile error: unknown literal")
+			fmt.Println("Compile error: unknown literal", expr)
+			os.Exit(1)
 		}
 	case ast.BinaryOperator:
 		compiler.compileExpression(expr.LeftExpression)

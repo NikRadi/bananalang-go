@@ -9,14 +9,14 @@ import (
 const stackSize = 8
 
 type VM struct {
-	stack 	[stackSize]int
-	sp 		int
+	stack [stackSize]int
+	sp    int
 }
 
 func NewVM() *VM {
 	return &VM{
-		stack: 	[stackSize]int{},
-		sp:		0,
+		stack: [stackSize]int{},
+		sp:    0,
 	}
 }
 
