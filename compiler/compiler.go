@@ -10,12 +10,14 @@ import (
 )
 
 type Compiler struct {
-	instructions []opcode.Opcode
+	instructions         []opcode.Opcode
+	variableToStackIndex map[string]int
 }
 
 func NewCompiler() *Compiler {
 	return &Compiler{
-		instructions: []opcode.Opcode{},
+		instructions:         []opcode.Opcode{},
+		variableToStackIndex: make(map[string]int),
 	}
 }
 
@@ -35,7 +37,8 @@ func (compiler *Compiler) compileExpression(expression ast.Expression) {
 			value, _ := strconv.Atoi(expr.Value)
 			compiler.emit(opcode.Push, opcode.Opcode(value))
 		case token.Identifier:
-			compiler.emit(opcode.Load, opcode.Opcode(0))
+			index := compiler.variableToStackIndex[expr.Value]
+			compiler.emit(opcode.Load, opcode.Opcode(index))
 		default:
 			fmt.Println("Compile error: unknown literal", expr)
 			os.Exit(1)
@@ -43,7 +46,8 @@ func (compiler *Compiler) compileExpression(expression ast.Expression) {
 	case ast.BinaryOperator:
 		if expr.Operator == token.Equals {
 			compiler.compileExpression(expr.RightExpression)
-			compiler.emit(opcode.Store, opcode.Opcode(0))
+			index := compiler.getIndex(expr.LeftExpression)
+			compiler.emit(opcode.Store, opcode.Opcode(index))
 			break
 		}
 
@@ -84,6 +88,24 @@ func (compiler *Compiler) compileExpression(expression ast.Expression) {
 	default:
 		fmt.Printf("Compile error: unknown expression type: %T\n", expr)
 		os.Exit(1)
+	}
+}
+
+func (compiler *Compiler) getIndex(expression ast.Expression) int {
+	switch expr := expression.(type) {
+	case ast.Literal:
+		index, ok := compiler.variableToStackIndex[expr.Value]
+		if ok {
+			return index
+		}
+
+		index = len(compiler.variableToStackIndex)
+		compiler.variableToStackIndex[expr.Value] = index
+		return index
+	default:
+		fmt.Println("Compile error: cannot find index of type", expression)
+		os.Exit(1)
+		return -1
 	}
 }
 

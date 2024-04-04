@@ -10,15 +10,16 @@ import (
 )
 
 func main() {
-	const code = "a=2; a=a*3"
+	const code = "a=1; b=2; c=3; d=4; a+b+c+d"
+	fmt.Println(code)
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)
 
 	tree := par.Parse()
-	fmt.Println(tree)
 
 	com := compiler.NewCompiler()
 	instructions := com.Compile(tree)
+	instructions = append(instructions, opcode.Print)
 	opcode.PrintOpcodes(instructions)
 
 	runtime := vm.NewVM()

@@ -12,7 +12,7 @@ type VM struct {
 
 func NewVM() *VM {
 	frame := &Frame{
-		LocalVariables: make(LocalVariables, 1),
+		LocalVariables: make(LocalVariables, 99),
 		OperandStack:   make(OperandStack, 0),
 	}
 

@@ -70,4 +70,10 @@ func TestArithmetic(t *testing.T) {
 
 	executeAndExpect(t, "a=2; a", 2)
 	executeAndExpect(t, "a=1+2; a=a*3; a;", 9)
+
+	executeAndExpect(t, "a=1; b=2; a;", 1)
+	executeAndExpect(t, "a=1; b=2; b;", 2)
+	executeAndExpect(t, "a=1; b=a*2+a; b;", 3)
+	executeAndExpect(t, "a=1; b=2; c=3; d=4; a+b+c+d", 10)
+	executeAndExpect(t, "a=1; a=2; a=3; a;", 3)
 }
