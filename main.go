@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const code = "a=1; b=2; c=3; d=4; a+b+c+d"
+	const code = "abcd = 1; abcd;"
 	fmt.Println(code)
 	lex := lexer.NewLexer(code)
 	par := parser.NewParser(lex)

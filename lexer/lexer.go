@@ -7,16 +7,16 @@ import (
 )
 
 type Lexer struct {
-	code 		string
-	codeIndex	int
-	token		token.Token
+	code      string
+	codeIndex int
+	token     token.Token
 }
 
 func NewLexer(code string) *Lexer {
 	lexer := &Lexer{
-		code: 		code,
-		codeIndex: 	0,
-		token:		token.Token{},
+		code:      code,
+		codeIndex: 0,
+		token:     token.Token{},
 	}
 
 	// Initialize the first Token
@@ -94,11 +94,14 @@ func (lexer *Lexer) EatToken() {
 		lexer.eatChar()
 	default:
 		if isDigit(c) {
-			lexer.token = token.Token{Type: token.LiteralNumber, Value: string(c)}
-			lexer.eatChar()
+			number := lexer.readSequence((isDigit))
+			lexer.token = token.Token{Type: token.LiteralNumber, Value: number}
 		} else if isAlphabetic(c) || c == '_' {
-			lexer.token = token.Token{Type: token.Identifier, Value: string(c)}
-			lexer.eatChar()
+			identifier := lexer.readSequence(func(c byte) bool {
+				return isAlphabetic(c) || isDigit(c) || c == '_'
+			})
+
+			lexer.token = token.Token{Type: token.Identifier, Value: identifier}
 		} else {
 			lexer.token = token.Token{Type: token.Error}
 			lexer.eatChar()
@@ -117,6 +120,15 @@ func (lexer *Lexer) eatChar() {
 
 func (lexer *Lexer) peekChar() byte {
 	return lexer.code[lexer.codeIndex]
+}
+
+func (lexer *Lexer) readSequence(isAllowed func(byte) bool) string {
+	start := lexer.codeIndex
+	for lexer.codeIndex < len(lexer.code) && isAllowed(lexer.peekChar()) {
+		lexer.eatChar()
+	}
+
+	return lexer.code[start:lexer.codeIndex]
 }
 
 func isAlphabetic(c byte) bool {
